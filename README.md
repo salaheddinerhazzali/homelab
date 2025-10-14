@@ -84,7 +84,7 @@ Everything needed to run my cluster & deploy my applications
         <td>Used for secrets management</td>
     </tr>
     <tr>
-        <td><img width="32" src="https://www.svgrepo.com/download/477066/lock.svg"></td>
+        <td><img width="32" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTmugUYJPzZLFhcwNyERJRDRXo7NOdVpcIZmkYoYQD8YiNMcaTr0uNvkmdn82cctyoWBKQ"></td>
         <td><a href="https://external-secrets.io/latest/">External Secrets Operator</a></td>
         <td>Used to sync my secrets from HashiCorp Vault</td>
     </tr>
