@@ -1,5 +1,3 @@
-# homelab
-
 # 🏠 Homelab
 
 ## Introduction
