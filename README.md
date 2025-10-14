@@ -46,6 +46,11 @@ End User Applications
         <td><a href="https://github.com/gethomepage/homepage">Homepage</a></td>
         <td>My customized portal to my homelab & internet</td>
     </tr>
+    <tr>
+        <td><img width="32" src="https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/postgresql.svg"></td>
+        <td><a href="https://github.com/gethomepage/homepage">Pgadmin</a></td>
+        <td>A web based administration tool for the PostgreSQL</td>
+    </tr>
 </table>
 
 
@@ -71,7 +76,7 @@ Everything needed to run my cluster & deploy my applications
     <tr>
         <td><img width="32" src="https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/cloudflare-zero-trust.png"></td>
         <td><a href="https://developers.cloudflare.com/cloudflare-one/">Cloudflare Zero Trust</a></td>
-        <td>Used for private tunnels to expose public services (without requiring a public IP).</td>
+        <td>A secure way to connect your resources to Cloudflare without a publicly routable IP address.</td>
     </tr>
     <tr>
         <td><img width="32" src="https://www.hashicorp.com/_next/static/media/vault_on-dark.97792f64.svg"></td>
@@ -82,6 +87,11 @@ Everything needed to run my cluster & deploy my applications
         <td><img width="32" src="https://www.svgrepo.com/download/477066/lock.svg"></td>
         <td><a href="https://external-secrets.io/latest/">External Secrets Operator</a></td>
         <td>Used to sync my secrets from HashiCorp Vault</td>
+    </tr>
+    <tr>
+        <td><img width="32" src="https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/postgresql.svg"></td>
+        <td><a href="https://cloudnative-pg.io/">CloudNativePG</a></td>
+        <td>Kubernetes operator for running PostgreSQL clusters</td>
     </tr>
     <tr>
         <td><img width="32" src="https://avatars.githubusercontent.com/u/33608853?s=48&v=4"></td>
