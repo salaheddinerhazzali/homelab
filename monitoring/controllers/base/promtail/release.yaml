@@ -1,0 +1,122 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: promtail
+  namespace: monitoring
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: promtail
+      version: '>=6.0.0'
+      sourceRef:
+        kind: HelmRepository
+        name: promtail
+        namespace: monitoring
+  values:
+    # Promtail config
+    config:
+      # Loki endpoint - use direct loki service, not gateway
+      clients:
+        - url: http://loki.monitoring.svc.cluster.local:3100/loki/api/v1/push
+          timeout: 10s
+          backoff_config:
+            min_period: 100ms
+            max_period: 10s
+            max_retries: 10
+      
+      # Scrape configs
+      snippets:
+        scrapeConfigs: |
+          # Scrape Kubernetes pods
+          - job_name: kubernetes-pods
+            pipeline_stages:
+              # Parse CRI format (containerd)
+              - cri: {}
+              
+              # Parse JSON logs from our app
+              - json:
+                  expressions:
+                    level: level
+                    app: app
+                    task_id: task_id
+                    task_type: task_type
+                    worker_id: worker_id
+                    message: message
+                    duration_ms: duration_ms
+              
+              # Add labels from parsed fields
+              - labels:
+                  level:
+                  task_type:
+              
+              # Use message as the log line
+              - output:
+                  source: message
+            
+            kubernetes_sd_configs:
+              - role: pod
+            
+            relabel_configs:
+              # Only scrape task-queue-worker namespace
+              - source_labels: [__meta_kubernetes_namespace]
+                regex: task-queue-worker
+                action: keep
+              
+              # Only scrape running pods
+              - source_labels: [__meta_kubernetes_pod_phase]
+                regex: Running
+                action: keep
+              
+              # Add namespace label
+              - source_labels: [__meta_kubernetes_namespace]
+                target_label: namespace
+              
+              # Add pod name label
+              - source_labels: [__meta_kubernetes_pod_name]
+                target_label: pod
+              
+              # Add container name label
+              - source_labels: [__meta_kubernetes_pod_container_name]
+                target_label: container
+              
+              # Add app label
+              - source_labels: [__meta_kubernetes_pod_label_app]
+                target_label: app
+              
+              # Set the log path
+              - source_labels: [__meta_kubernetes_pod_uid, __meta_kubernetes_pod_container_name]
+                target_label: __path__
+                separator: /
+                replacement: /var/log/pods/*$1*/$2/*.log
+    
+    # Deploy as DaemonSet (runs on all nodes)
+    daemonset:
+      enabled: true
+    
+    # Resource limits
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+    
+    # Tolerations to run on all nodes
+    tolerations:
+      - effect: NoSchedule
+        operator: Exists
+    
+    # RBAC
+    rbac:
+      create: true
+    
+    serviceAccount:
+      create: true
+    
+    # ServiceMonitor for Promtail metrics (optional)
+    serviceMonitor:
+      enabled: true
+      labels:
+        release: kube-prometheus-stack

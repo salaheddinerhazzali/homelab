@@ -1,0 +1,121 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: vault-eso
+  namespace: vault
+spec:
+  template:
+    spec:
+      serviceAccountName: vault-eso
+      restartPolicy: OnFailure
+      initContainers:
+      - name: wait-for-init
+        image: alpine:3.22
+        command:
+        - /bin/sh
+        - -c
+        - |
+
+          # Install required tools
+          echo "Installing required tools"
+          apk add --no-cache wget unzip jq
+
+          # Install vault CLI
+          echo "Installing Vault CLI"
+          wget https://releases.hashicorp.com/vault/1.17.2/vault_1.17.2_linux_amd64.zip
+          unzip vault_1.17.2_linux_amd64.zip
+          mv vault /usr/local/bin/
+          chmod +x /usr/local/bin/vault
+
+          echo "Vault Installed"
+
+          for i in 0 1; do
+            until [ "$(vault status -address=http://vault-$i.vault-internal:8200 -format=json | jq -r '.sealed')" = "false" ]; do
+              echo "Waiting for Vault-$i to be unsealed..."
+              sleep 10
+            done
+            echo "vault-$i is already unsealed"
+          done
+      containers:
+      - name: config
+        image: alpine:3.22
+        envFrom:
+        - secretRef:
+            name: vault-unseal-keys
+        command:
+        - /bin/sh
+        - -c
+        - |
+
+          # Install required tools
+          echo "Installing required tools"
+          apk add --no-cache wget unzip jq kubectl
+
+          # Install vault CLI
+          echo "Installing Vault CLI"
+          wget https://releases.hashicorp.com/vault/1.17.2/vault_1.17.2_linux_amd64.zip
+          unzip vault_1.17.2_linux_amd64.zip
+          mv vault /usr/local/bin/
+          chmod +x /usr/local/bin/vault
+
+          echo "Vault Installed"
+
+          export VAULT_ADDR=http://vault-0.vault-internal:8200
+
+          # Login with root token"
+          echo "Login ..."
+          vault login $ROOT_TOKEN
+
+
+          # Enable KV v2 secrets engine
+          echo "Enable KV v2 secrets engine"
+          vault secrets enable -path=secret kv-v2 || echo "KV v2 already enabled"
+
+          # Create a policy for ESO
+          echo "Creating a policy for ESO"
+          vault policy write external-secrets - <<EOF
+          path "secret/data/*" {
+            capabilities = ["read", "list"]
+          }
+          path "secret/metadata/*" {
+            capabilities = ["read", "list"]
+          }
+          EOF
+
+          # Enable AppRole auth for ESO
+          echo "Enable AppRole auth for ESO"
+          vault auth enable approle || echo "AppRole already enabled"
+
+          # Create a role for ESO
+          echo "Create a role for ESO"
+          vault write auth/approle/role/external-secrets \
+            token_policies="external-secrets" \
+            token_ttl=1h \
+            token_max_ttl=4h
+
+          # Get Role ID
+          echo "Get Role ID"
+          ROLE_ID=$(vault read -field=role_id auth/approle/role/external-secrets/role-id)
+          echo "ROLE_ID : $ROLE_ID"
+
+          # Get Secret ID
+          SECRET_ID=$(vault write -field=secret_id -f auth/approle/role/external-secrets/secret-id)
+          echo "SECRET_ID : $SECRET_ID"
+
+          # Create secret with approle keys
+          echo "Creating Secret with approle keys"
+          cat <<EOF | kubectl apply -f -
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: vault-approle-secrets
+            namespace: vault
+            annotations:
+              reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+              reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "external-secrets"
+              reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+          type: Opaque
+          data:
+            ROLE_ID: $(echo -n "${ROLE_ID}" | base64 -w 0)
+            SECRET_ID: $(echo -n "${SECRET_ID}" | base64 -w 0)
+          EOF

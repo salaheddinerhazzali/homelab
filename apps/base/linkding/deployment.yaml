@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: linkding
+  namespace: linkding
+  labels:
+    app: linkding
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: linkding
+  template:
+    metadata:
+      labels:
+        app: linkding
+    spec:
+      containers:
+      - name: linkding
+        image: sissbruecker/linkding:1.24.0
+        ports:
+        - containerPort: 9090
+          name: http
+        env:
+        - name: LD_SUPERUSER_NAME
+          valueFrom:
+            secretKeyRef:
+              name: linkding-app-secrets 
+              key: superuser_name
+        - name: LD_SUPERUSER_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: linkding-app-secrets 
+              key: superuser_password
+        - name: LD_DISABLE_BACKGROUND_TASKS
+          value: "False"
+        - name: LD_DISABLE_URL_VALIDATION
+          value: "False"
+        volumeMounts:
+        - name: data
+          mountPath: /etc/linkding/data
+        resources:
+          requests:
+            cpu: 50m
+            memory: 128Mi
+          limits:
+            memory: 256Mi
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: linkding-pvc
