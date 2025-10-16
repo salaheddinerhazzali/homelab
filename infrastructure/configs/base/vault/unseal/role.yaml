@@ -7,6 +7,3 @@ rules:
 - apiGroups: [""]
   resources: ["secrets"]
   verbs: ["get"]
-#- apiGroups: [""]
-#  resources: ["pods/exec"]
-#  verbs: ["create"]

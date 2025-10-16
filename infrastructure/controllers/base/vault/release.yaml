@@ -75,7 +75,7 @@ spec:
       dataStorage:
         enabled: true
         size: 10Gi
-        storageClass: piraeus-storage  # Use default storage class
+        storageClass: piraeus-storage
         accessMode: ReadWriteOnce
       
       # Audit storage
