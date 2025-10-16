@@ -21,27 +21,14 @@ spec:
         fsGroup: 5050
       containers:
       - name: pgadmin
-        image: dpage/pgadmin4:8.2
+        image: dpage/pgadmin4:9.8
         ports:
         - containerPort: 8080
-          name: http
-        env:
-        - name: PGADMIN_DEFAULT_EMAIL
-          value: test@test.com
-          #valueFrom:
-          #  secretKeyRef:
-          #    name: pgadmin-credentials
-          #    key: default-email
-        - name: PGADMIN_DEFAULT_PASSWORD
-          value: test
-          #valueFrom:
-          #  secretKeyRef:
-          #    name: pgadmin-credentials
-          #    key: default-password
-        - name: PGADMIN_LISTEN_PORT
-          value: "8080"
-        - name: PGADMIN_LISTEN_ADDRESS
-          value: "0.0.0.0"
+        envFrom:
+          - configMapRef:
+              name: pgadmin-configmap
+          - secretRef:
+              name: pgadmin-credentials
         volumeMounts:
         - name: pgadmin-data
           mountPath: /var/lib/pgadmin

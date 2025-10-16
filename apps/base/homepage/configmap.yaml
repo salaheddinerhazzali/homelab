@@ -4,8 +4,8 @@ metadata:
   name: homepage
   namespace: homepage
 data:
-  #kubernetes.yaml: |
-  #  mode: cluster
+  kubernetes.yaml: |
+    mode: cluster
   settings.yaml: ""
   custom.css: ""
   custom.js: ""

@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: linkding-configmap
+data:
+  LD_DISABLE_BACKGROUND_TASKS: "False"
+  LD_DISABLE_URL_VALIDATION: "False"
