@@ -5,3 +5,7 @@ metadata:
 data:
   LD_DISABLE_BACKGROUND_TASKS: "False"
   LD_DISABLE_URL_VALIDATION: "False"
+  LD_DB_ENGINE: postgres
+  LD_DB_DATABASE: "linkding"
+  LD_DB_HOST: "linkding-postgres-rw.linkding.svc"
+  LD_DB_PORT: "5432"

@@ -1,0 +1,18 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: databases
+  namespace: flux-system
+spec:
+  interval: 1m0s
+  retryInterval: 1m0s
+  timeout: 5m0s
+  path: ./databases/staging
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  dependsOn:
+    - name: external-secrets-config
+    - name: cnpg
+    - name: cilium-config

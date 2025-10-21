@@ -1,0 +1,46 @@
+talos notes : 
+
+
+cat > patch-controlplane.yaml <<'EOF'
+machine:
+  network:
+    hostname: controlplane
+    interfaces:
+      - interface: eno1
+        dhcp: false
+        addresses:
+          - 192.168.1.101/24
+        routes:
+          - network: 0.0.0.0/0
+            gateway: 192.168.1.254
+    nameservers:
+      - 8.8.8.8
+      - 1.1.1.1
+  install:
+    disk: /dev/sda
+    wipe: true
+EOF
+
+cat > patch-worker2.yaml <<'EOF'
+machine:
+  network:
+    hostname: worker2
+    interfaces:
+      - interface: enp2s0
+        dhcp: false
+        addresses:
+          - 192.168.1.103/24
+        routes:
+          - network: 0.0.0.0/0
+            gateway: 192.168.1.254
+    nameservers:
+      - 8.8.8.8
+      - 1.1.1.1
+  install:
+    disk: /dev/sda
+    wipe: true
+EOF
+
+talosctl apply-config --insecure --nodes 192.168.1.8 --file controlplane.yaml
+
+talosctl apply-config --insecure --nodes 192.168.1.69 --file worker.yaml

@@ -1,0 +1,50 @@
+# infrastructure/cnpg-cluster.yaml
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: linkding-postgres
+  namespace: linkding
+  labels:
+    app: linkding
+    component: database
+spec:
+  instances: 1
+  
+  bootstrap:
+    initdb:
+      database: linkding
+      owner: linkding
+      
+  superuserSecret:
+    name: linkding-db-secret
+  
+  enableSuperuserAccess: true
+  
+  # Managed role for the linkding user
+  managed:
+    roles:
+      - name: linkding
+        ensure: present
+        login: true
+        superuser: false
+        createdb: false
+        createrole: false
+        inherit: true
+        replication: false
+        connectionLimit: -1
+        passwordSecret:
+          name: linkding-user-password
+  
+  storage:
+    size: 1Gi
+    storageClass: piraeus-storage
+  
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "500m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  
