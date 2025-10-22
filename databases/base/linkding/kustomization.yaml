@@ -4,3 +4,4 @@ namespace: linkding
 resources:
   - database.yaml
   - external-secrets.yaml
+  - network-policies.yaml

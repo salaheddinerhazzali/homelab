@@ -1,0 +1,104 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-all-db
+  namespace: linkding
+spec:
+  podSelector:
+    matchLabels:
+      cnpg.io/cluster: linkding-postgres
+  policyTypes:
+    - Ingress
+    - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-dns
+  namespace: linkding
+spec:
+  podSelector:
+    matchLabels:
+      cnpg.io/cluster: linkding-postgres
+  policyTypes:
+    - Egress
+  egress:
+    - ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-linkding-app
+  namespace: linkding
+spec:
+  podSelector:
+    matchLabels:
+      cnpg.io/cluster: linkding-postgres
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: linkding
+      ports:
+        - port: 5432
+          protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-pgadmin-app
+  namespace: linkding
+spec:
+  podSelector:
+    matchLabels:
+      cnpg.io/cluster: linkding-postgres
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: pgadmin
+          namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: pgadmin
+      ports:
+        - port: 5432
+          protocol: TCP
+#---
+## For DB replication to other instances
+## Since we are only using one instance we can comment it
+#apiVersion: networking.k8s.io/v1
+#kind: NetworkPolicy
+#metadata:
+#  name: allow-db-egress
+#  namespace: linkding
+#spec:
+#  podSelector:
+#    matchLabels:
+#      cnpg.io/cluster: linkding-postgres
+#  policyTypes:
+#    - Egress
+#    - Ingress
+#  egress:
+#    - to:
+#        - podSelector:
+#            matchLabels:
+#              cnpg.io/cluster: linkding-postgres
+#      ports:
+#        - port: 5432
+#          protocol: TCP
+#  ingress:
+#    - from:
+#      - podSelector:
+#          matchLabels:
+#            cnpg.io/cluster: linkding-postgres
+#      ports:
+#        - port: 5432
+#          protocol: TCP
