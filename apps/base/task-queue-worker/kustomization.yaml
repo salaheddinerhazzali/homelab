@@ -3,5 +3,6 @@ kind: Kustomization
 namespace: task-queue-worker
 resources:
   - namespace.yaml
+  - external-secrets.yaml
   - deployment.yaml
   - service.yaml
