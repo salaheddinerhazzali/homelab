@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: deny-all-db
+  name: deny-all-ingress
   namespace: linkding
 spec:
   podSelector:
@@ -9,25 +9,6 @@ spec:
       cnpg.io/cluster: linkding-postgres
   policyTypes:
     - Ingress
-    - Egress
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: allow-dns
-  namespace: linkding
-spec:
-  podSelector:
-    matchLabels:
-      cnpg.io/cluster: linkding-postgres
-  policyTypes:
-    - Egress
-  egress:
-    - ports:
-        - port: 53
-          protocol: UDP
-        - port: 53
-          protocol: TCP
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
