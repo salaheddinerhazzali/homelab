@@ -25,7 +25,7 @@ spec:
     prometheus:
       enabled: true
       #servicemonitor:
-      #  enabled: false  # Enable if you have Prometheus
+      #  enabled: false
     
     # Security context
     securityContext:
