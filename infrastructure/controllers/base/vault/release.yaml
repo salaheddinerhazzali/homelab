@@ -29,7 +29,7 @@ spec:
       statefulSet:
         podManagementPolicy: "OrderedReady"  # Forces sequential startup
       
-      # Use HA mode with Raft storage
+      # Use HA mode with Raft
       ha:
         enabled: true
         replicas: 2

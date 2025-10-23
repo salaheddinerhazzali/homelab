@@ -3,7 +3,6 @@ kind: Ingress
 metadata:
   name: pgadmin
   namespace: pgadmin
-  annotations:
 spec:
   ingressClassName: cilium
   rules:

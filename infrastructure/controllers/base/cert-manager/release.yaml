@@ -24,13 +24,12 @@ spec:
     # Prometheus metrics
     prometheus:
       enabled: true
-      servicemonitor:
-        enabled: false  # Enable if you have Prometheus
+      #servicemonitor:
+      #  enabled: false  # Enable if you have Prometheus
     
     # Security context
     securityContext:
       runAsNonRoot: true
-      fsGroup: 1000
     
     # Resource limits for production
     resources:
