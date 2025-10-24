@@ -19,8 +19,7 @@ spec:
       namespace: vault
       
     injector:
-      enabled: true
-      replicas: 2
+      enabled: false
     
     server:
       enabled: true
@@ -46,7 +45,7 @@ spec:
               address = "[::]:8200"
               cluster_address = "[::]:8201"
               # Enable X-Forwarded headers for Ingress
-              x_forwarded_for_authorized_addrs = "10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
+              x_forwarded_for_authorized_addrs = "192.168.0.0/16"
               x_forwarded_for_reject_not_authorized = false
             }
             
