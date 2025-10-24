@@ -30,6 +30,7 @@ spec:
     # Security context
     securityContext:
       runAsNonRoot: true
+      fsGroup: 1000
     
     # Resource limits for production
     resources:
